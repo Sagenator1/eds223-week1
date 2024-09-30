@@ -1,0 +1,120 @@
+---
+title: "Untitled"
+author: "Sage Davis"
+date: "2024-09-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages('sf') #vector data
+install.packages('stars') #raster data
+install.packages("tmap")
+install.packages("here")
+
+```
+
+```{r}
+library(sf) # for vector data (more soon!)
+library(stars) # for raster data (more soon!)
+library(tmap) # for static and interactive maps
+library(here)
+```
+
+
+```{r}
+# raster of global ele
+world_elevation <- read_stars(here("data", "worldelevation.tif"))
+
+# countries boundaries
+world_vector <- read_sf(here("data", "worldvector.gpkg"))
+
+# major cities
+world_cities <- read_sf(here("data","worldcities.gpkg"))
+
+```
+
+
+```{r}
+
+# make the map in lays you want
+
+tm_shape(world_elevation) +
+  tm_raster() +
+tm_shape(world_vector) +
+  tm_borders() +
+  tm_shape(world_cities, is.master = TRUE) +
+  tm_dots()
+
+#another way
+#tm_shape(world_elevation, bbox = c(15, 35, 45, 65)) + #bbox = world_cities
+  #tm_roster() +
+#tm_shape(world_vector) +
+ # tm_borders() +
+  
+```
+
+```{r}
+# plotting vector and raster spatial objects
+
+tm_shape(world_elevation) + # plot global elevations
+  tm_raster() + # tm_raster for raster data
+tm_shape(world_vector) +
+  tm_borders() +
+tm_shape(world_cities) +
+  tm_dots() +
+  tm_text("name")
+```
+
+```{r}
+tm_shape(world_vector) +
+  tm_polygons("life_expectancy",
+              pallet = c ("yellow", "darkgreen"))
+```
+
+
+```{r}
+
+install.packages("viridisLite")
+
+library(viridisLite)
+
+```
+
+```{r}
+tm_shape(world_vector) +
+  tm_polygons() +
+  tm_shape(world_cities) +
+  tm_symbols(size = "pop2020",
+             legend.size.is.portrait = TRUE)
+```
+```{r}
+tm_shape(world_vector) +
+  tm_graticules() +
+  tm_fill() 
+
+```
+```{r}
+tm_shape(world_vector) +
+  tm_fill() +
+  tm_scale_bar() +
+  tm_compass(position = c("left", "top"))
+```
+```{r}
+tmap_mode("view") #interactive map command
+
+
+map_1 <- tm_shape(world_vector) +
+  tm_fill(col = "wb_income_region", 
+          pallette = viridisLite::plasma(5),
+          title = "Regional income") +
+        tm_layout(bg.color = "gray95",
+                  main.title = "Global Income by country",
+                  frame = FALSE)
+
+tmap_save(map_1, here("tmap_ex.png"))
+```
+

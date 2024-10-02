@@ -1,0 +1,70 @@
+---
+title: "EDS223 Discussion1"
+author: "Sage"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages('sf') #vector data
+install.packages('stars') #raster data
+install.packages("tmap")
+install.packages("here")
+install.packages("tidyverse")
+
+```
+
+```{r}
+library(sf) # for vector data (more soon!)
+library(stars) # for raster data (more soon!)
+library(tmap) # for static and interactive maps
+library(here)
+library(tidyverse)
+```
+
+Read In EI Data
+
+```{r}
+ei_points <- sf::read_sf(here::here("data", "easter_island", "ei_points.gpkg"))
+volcanoes <- subset(ei_points, type == "volcano")
+ei_elev <- stars::read_stars(here::here("data", "easter_island", "ei_elev.tif"))
+ei_borders <- sf::read_sf(here::here("data", "easter_island", "ei_border.gpkg"))
+ei_roads <- sf::read_sf(here::here("data", "easter_island", "ei_roads.gpkg"))
+```
+
+```{r}
+#Easter island map
+
+tm_shape(ei_elev) +
+  tm_raster() +
+tm_shape(ei_borders) +
+  tm_borders() +
+  tm_shape(ei_roads, is.master = TRUE) +
+  tm_lines() +
+tm_shape(volcanoes, is.master = TRUE) +
+  tm_dots()
+```
+
+```{r}
+#Easter island map again
+ 
+tmap_mode("view")
+
+tm_shape(ei_elev) +
+  tm_raster(palette = c ("tan", "brown"),
+                        title = "Elevation") + 
+  
+tm_shape(ei_borders) +
+  tm_borders() +
+  tm_shape(ei_roads, is.master = TRUE) +
+  tm_lines() +
+tm_shape(volcanoes, is.master = TRUE) +
+  tm_dots(size = 0.3, col = "red") 
+  
+tmap_mode("plot")
+
+```
